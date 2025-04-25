@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "511340597956",
+    "project_id": "what2wear-e2379",
+    "storage_bucket": "what2wear-e2379.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511340597956:android:bea09a8a1e5158f47bef91",
+        "android_client_info": {
+          "package_name": "com.projekt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByONvhFx-O-bKb4SNdBf1mlksHy6um4PI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
