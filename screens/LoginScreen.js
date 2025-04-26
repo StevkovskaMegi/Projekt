@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import {signInWithEmailAndPassword} from 'firebase/auth';
-import {auth} from '../services/firebase';
+import auth from '@react-native-firebase/auth';
+
 import {colors, typography, button, spacing} from '../theme/theme';
 import {Dimensions} from 'react-native';
 
@@ -20,7 +20,8 @@ export default function LoginScreen({navigation}) {
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await auth().signInWithEmailAndPassword(email, password);
+      navigation.navigate('Home');
     } catch (err) {
       setError('Invalid email or password.');
     }

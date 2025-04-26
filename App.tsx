@@ -7,6 +7,9 @@ import BoardingScreen from './screens/BoardingScreen';
 import LoginScreen from './screens/LoginScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import HomeScreen from './screens/HomeScreen';
+import TabNavigator from './navigation/TabNavigator';
+import UserScreen from './screens/UserScreen';
+import SettingsScreen from './screens/SettingsScreen';
 
 const Stack = createStackNavigator();
 
@@ -18,7 +21,11 @@ export default function App() {
         <Stack.Screen name="Welcome" component={BoardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Profile" component={UserScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+
+        {/* Here instead of HomeScreen: */}
+        <Stack.Screen name="Home" component={TabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );
