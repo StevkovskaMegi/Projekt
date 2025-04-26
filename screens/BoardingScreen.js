@@ -1,25 +1,39 @@
 // screens/BoardingScreen.js
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { colors, typography } from '../theme/theme';
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import {colors, typography, button, spacing} from '../theme/theme';
+import {Dimensions} from 'react-native';
 
-export default function BoardingScreen({ navigation }) {
+const {width, height} = Dimensions.get('window');
+
+export default function BoardingScreen({navigation}) {
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/boarding.png')} style={styles.image} />
+      <View style={styles.topContainer}>
+        <Image
+          source={require('../assets/images/boarding.png')}
+          style={styles.image}
+        />
 
-      <Text style={styles.welcome}>Welcome to</Text>
-      <Text style={styles.title}>What2Wear</Text>
-      <Text style={styles.subtitle}>Your daily outfit assistant</Text>
+        <Text style={styles.welcome}>Welcome to</Text>
+        <Text style={styles.title}>What2Wear</Text>
+        <Text style={styles.subtitle}>Your daily outfit assistant</Text>
+      </View>
+      <View style={{flex: 1}} />
 
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.loginBtn} onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.loginText}>Log in</Text>
-        </TouchableOpacity>
+      <View style={styles.bottomContainer}>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginText}>Log in</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.signupBtn} onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.signupText}>Sign up</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <Text style={styles.signupText}>Sign up</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+            <Text style={styles.signupText}>Home</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -33,6 +47,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
   },
+  topContainer: {
+    alignItems: 'center',
+    marginTop: height * 0.3,
+  },
+  bottomContainer: {
+    alignItems: 'center',
+    marginBottom: height * 0.07,
+  },
   image: {
     height: 260,
     resizeMode: 'contain',
@@ -40,43 +62,33 @@ const styles = StyleSheet.create({
   },
   welcome: {
     ...typography.heading2,
-    color: '#fff',
+    color: colors.white,
     fontStyle: 'italic',
   },
   title: {
     ...typography.heading1,
-    color: '#C13551',
-    marginTop: 5,
+    color: colors.moderateRed,
+    marginTop: spacing.xs,
   },
   subtitle: {
+    ...typography.paragraph2,
     fontSize: 14,
     color: '#ccc',
-    marginTop: 10,
+    marginTop: spacing.xs,
   },
   buttonRow: {
     flexDirection: 'row',
     marginTop: 40,
     gap: 16,
   },
-  loginBtn: {
-    backgroundColor: '#C13551',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 10,
-  },
   loginText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  signupBtn: {
-    borderWidth: 1,
-    borderColor: '#C13551',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 10,
+    ...button.primary,
+    textAlign: 'center',
+    width: width * 0.4,
   },
   signupText: {
-    color: '#C13551',
-    fontSize: 16,
+    ...button.secondary,
+    textAlign: 'center',
+    width: width * 0.4,
   },
 });

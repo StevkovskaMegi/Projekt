@@ -12,7 +12,7 @@ export default function SplashScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
+      <Image source={require('../assets/images/logo.png')} style={styles.logo} />
       <Text style={styles.title}>What2Wear</Text>
       <ActivityIndicator size="small" color="#C13551" style={styles.loading} />
     </View>
