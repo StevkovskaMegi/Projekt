@@ -1,8 +1,13 @@
 # OSX
 #
 .DS_Store
-
+# Ignore node_modules
+node_modules/
+#  Ignore environment files if you have them
+.env
 # Xcode
+# Ignore builds
+android/app/build/
 #
 build/
 *.pbxuser
