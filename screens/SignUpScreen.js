@@ -6,18 +6,20 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
-import {createUserWithEmailAndPassword} from 'firebase/auth';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {colors, typography, button, spacing} from '../theme/theme';
-import { setDoc, doc } from '@react-native-firebase/firestore';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function SignUpScreen({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [successVisible, setSuccessVisible] = useState(false);
 
   const handleSignUp = async () => {
     if (!email || !password || !confirmPassword) {
@@ -28,35 +30,55 @@ export default function SignUpScreen({navigation}) {
       setError('Passwords do not match.');
       return;
     }
+
+    setLoading(true);
+
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(
         email,
         password,
       );
 
-      await firestore()
-        .collection('users')
-        .doc(userCredential.user.uid)
-        .set({
-          email: email,
-          username: '',
-          bio: '',
-          createdAt: new Date(),
-        });
+      await firestore().collection('users').doc(userCredential.user.uid).set({
+        email: email,
+        username: '',
+        bio: '',
+        avatarUrl: '',
+        fullName: '',
+        twoFactorEmail:email,
+        isTwoFactorEnabled: false,
+        createdAt: new Date(),
+      });
 
-      navigation.navigate('Login');
+      // Reset fields first
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setError(null);
+      setLoading(false); // stop loading before navigating
+      navigation.navigate('Login', {from: 'SignUp'});
     } catch (err) {
+      setLoading(false);
+
       if (err.code === 'auth/email-already-in-use') {
         setError('This email is already in use.');
+      } else if (err.code === 'auth/network-request-failed') {
+        setError('Network error. Please check your internet connection.');
       } else {
-        console.error('Signup error:', err);
         setError('Something went wrong. Try again.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={24} color={colors.white} />
+      </TouchableOpacity>
       <Text style={styles.heading}>Sign up</Text>
 
       <TextInput
@@ -88,9 +110,18 @@ export default function SignUpScreen({navigation}) {
 
       {error && <Text style={styles.error}>{error}</Text>}
 
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonStyle}>Sign up</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator size="large" color={colors.primary} />
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+          <Text style={styles.buttonStyle}>Sign up</Text>
+        </TouchableOpacity>
+      )}
+      {successVisible && (
+        <View style={styles.successToast}>
+          <Text style={styles.successText}>Registration successful!</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -127,5 +158,27 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     marginBottom: 10,
+  },
+  successToast: {
+    position: 'absolute',
+    top: 50,
+    alignSelf: 'center',
+    backgroundColor: '#333',
+    padding: 10,
+    borderRadius: 8,
+    zIndex: 999,
+  },
+  successText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  backButton: {
+    marginBottom: spacing.m,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.darkGray1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

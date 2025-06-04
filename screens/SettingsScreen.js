@@ -10,6 +10,11 @@ import {
 } from 'react-native';
 import {colors, typography, spacing} from '../theme/theme';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {Alert} from 'react-native';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
+import {EmailAuthProvider} from '@react-native-firebase/auth';
 
 export default function SettingsScreen({navigation}) {
   const [showPasswordInputs, setShowPasswordInputs] = useState(false);
@@ -18,7 +23,52 @@ export default function SettingsScreen({navigation}) {
   const [isNewPasswordFocused, setIsNewPasswordFocused] = useState(false);
   const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] =
     useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [changingPwd, setChangingPwd] = useState(false);
+  const [currFocused, setCurrFocused] = useState(false);
+  const userDoc = firestore().doc(`users/${auth().currentUser.uid}`);
 
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      Alert.alert('Fill all fields');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Passwords do not match');
+      return;
+    }
+    if (newPassword.length < 6) {
+      Alert.alert('Password must be ≥ 6 characters');
+      return;
+    }
+
+    try {
+      setChangingPwd(true);
+      const user = auth().currentUser;
+      const cred = EmailAuthProvider.credential(user.email, currentPassword);
+
+      // re-authenticate
+      await user.reauthenticateWithCredential(cred);
+      // set new password
+      await user.updatePassword(newPassword);
+
+      Alert.alert('Success', 'Password updated');
+      // clear fields + collapse panel
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowPasswordInputs(false);
+    } catch (e) {
+      const msg =
+        e.code === 'auth/wrong-password'
+          ? 'Current password is incorrect'
+          : e.message;
+      Alert.alert('Error', msg);
+    } finally {
+      setChangingPwd(false);
+    }
+  };
   const togglePasswordFields = () => {
     setShowPasswordInputs(!showPasswordInputs);
   };
@@ -45,49 +95,64 @@ export default function SettingsScreen({navigation}) {
 
         {showPasswordInputs && (
           <>
+            {/* current password */}
+            <TextInput
+              placeholder="Current password"
+              placeholderTextColor={colors.white}
+              secureTextEntry
+              value={currentPassword}
+              onChangeText={setCurrentPassword}
+              onFocus={() => setCurrFocused(true)}
+              onBlur={() => setCurrFocused(false)}
+              style={[styles.input, currFocused && styles.inputFocused]}
+            />
+
+            {/* new password */}
             <TextInput
               placeholder="Enter your new password"
               placeholderTextColor={colors.white}
-              style={[
-                styles.input,
-                isNewPasswordFocused && styles.inputFocused, 
-              ]}
               secureTextEntry
               value={newPassword}
               onChangeText={setNewPassword}
               onFocus={() => setIsNewPasswordFocused(true)}
               onBlur={() => setIsNewPasswordFocused(false)}
+              style={[
+                styles.input,
+                isNewPasswordFocused && styles.inputFocused,
+              ]}
             />
+
+            {/* confirm */}
             <TextInput
               placeholder="Confirm your new password"
               placeholderTextColor={colors.white}
-              style={[
-                styles.input,
-                isConfirmPasswordFocused && styles.inputFocused, 
-              ]}
               secureTextEntry
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               onFocus={() => setIsConfirmPasswordFocused(true)}
               onBlur={() => setIsConfirmPasswordFocused(false)}
+              style={[
+                styles.input,
+                isConfirmPasswordFocused && styles.inputFocused,
+              ]}
             />
+
+            {/* save button */}
+            <TouchableOpacity
+              style={[
+                styles.option,
+                {justifyContent: 'center', marginTop: spacing.s},
+                changingPwd && {opacity: 0.6},
+              ]}
+              disabled={changingPwd}
+              onPress={handleChangePassword}>
+              <Text style={styles.optionText}>
+                {changingPwd ? 'Saving…' : 'Confirm new password'}
+              </Text>
+            </TouchableOpacity>
           </>
         )}
 
-        <TouchableOpacity style={styles.option}>
-          <Text style={styles.optionText}>Two-Factor Authentication</Text>
-          <Ionicons name="chevron-forward" size={20} color={colors.white} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.option}>
-          <Text style={styles.optionText}>Change Username</Text>
-          <Ionicons name="chevron-forward" size={20} color={colors.white} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.option}>
-          <Text style={styles.optionText}>Change Email</Text>
-          <Ionicons name="chevron-forward" size={20} color={colors.white} />
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -101,8 +166,8 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   inputFocused: {
-    borderColor: colors.moderateRed, // or any color you want on focus
-    borderWidth: 2,
+    borderColor: colors.gray31, // or any color you want on focus
+    borderWidth: 1,
   },
 
   backButton: {

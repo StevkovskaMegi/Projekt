@@ -17,10 +17,10 @@ export default function HomeScreen({navigation}) {
       </TouchableOpacity>
 
       <View style={styles.insideContainer}>
-        <Image
+        {/* <Image
           source={require('../assets/images/image.png')}
           style={styles.logo}
-        />
+        /> */}
         <Text style={styles.text}>Style it your way-mix, match, and slay</Text>
       </View>
     </View>

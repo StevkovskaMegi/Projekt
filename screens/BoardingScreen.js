@@ -12,11 +12,11 @@ export default function BoardingScreen({navigation}) {
       <View style={styles.topContainer}>
         <Image
           source={require('../assets/images/boarding.png')}
-          style={styles.image}
+          style={[styles.image, {height: '50%'}]} 
         />
 
-        <Text style={styles.welcome}>Welcome to</Text>
-        <Text style={styles.title}>What2Wear</Text>
+        <Text style={styles.title}>Welcome to your </Text>
+        <Text style={styles.title}>curated closet</Text>
         <Text style={styles.subtitle}>Your daily outfit assistant</Text>
       </View>
       <View style={{flex: 1}} />
@@ -29,9 +29,6 @@ export default function BoardingScreen({navigation}) {
 
           <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
             <Text style={styles.signupText}>Sign up</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-            <Text style={styles.signupText}>Home</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -53,7 +50,8 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     alignItems: 'center',
-    marginBottom: height * 0.07,
+    height: height * 0.2,
+    marginBottom: height * 0.1,
   },
   image: {
     height: 260,
@@ -68,11 +66,14 @@ const styles = StyleSheet.create({
   title: {
     ...typography.heading1,
     color: colors.moderateRed,
+    fontWeight: 'light',
     marginTop: spacing.xs,
+    textAlign: 'center',
   },
   subtitle: {
     ...typography.paragraph2,
     fontSize: 14,
+    fontStyle: 'italic',
     color: '#ccc',
     marginTop: spacing.xs,
   },
