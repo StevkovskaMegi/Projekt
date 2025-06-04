@@ -13,7 +13,6 @@ export default function SplashScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/images/logo.png')} style={styles.logo} />
-      <Text style={styles.title}>What2Wear</Text>
       <ActivityIndicator size="small" color="#C13551" style={styles.loading} />
     </View>
   );
@@ -27,7 +26,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    height: 100,
+    height: 200,
     resizeMode: 'contain',
     marginBottom: 10,
   },
