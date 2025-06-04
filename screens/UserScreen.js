@@ -6,7 +6,10 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,Modal,TextInput, Alert
+  ActivityIndicator,
+  Modal,
+  TextInput,
+  Alert,
 } from 'react-native';
 import {colors, typography, spacing} from '../theme/theme';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // back arrow icon
@@ -18,36 +21,101 @@ export default function ProfileScreen({navigation}) {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [editing, setEditing] = useState(false);
+  const [editingUsername, setEditingUsername] = useState(false);
+  const [editing, setEditing] = useState(false); // za modal
+  const [editingBio, setEditingBio] = useState(false);
+
   const [form, setForm] = useState({username: '', bio: ''});
   const [savingProfile, setSavingProfile] = useState(false);
-  const openEditor = () => {
-    setForm({
-      username: userData?.username || '',
-      bio: userData?.bio || '',
-    });
-    setEditing(true);
-  };
-  const saveProfile = async () => {
-    if (!auth().currentUser) return;
-    setSavingProfile(true);
+  const handleSignOut = async () => {
     try {
-      await firestore().collection('users').doc(auth().currentUser.uid).update({
-        username: form.username.trim(),
-        bio: form.bio.trim(),
-      });
-      setUserData(prev => ({
-        ...prev,
-        username: form.username.trim(),
-        bio: form.bio.trim(),
-      }));
-      setEditing(false);
+      await auth().signOut(); // 🔑 Firebase odjava
+      // navigation.reset({
+      //   index: 0,
+      //   routes: [{name: 'Login'}], // vrni se na prijavni ekran
+      // });
+      // navigation.navigate('Boarding');
+
     } catch (e) {
       Alert.alert('Error', e.message);
-    } finally {
-      setSavingProfile(false);
     }
   };
+  const ProfileRow = ({label, value, onPress}) => (
+    <TouchableOpacity
+      disabled={!onPress}
+      onPress={onPress}
+      style={styles.rowItem}>
+      <Text style={styles.rowLabel}>{label}</Text>
+      <View style={styles.rowValueWrap}>
+        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.rowValue}>
+          {value}
+        </Text>
+        {onPress && ( // pokaži “>” samo kadar je to klikljivo
+          <Ionicons name="chevron-forward" size={18} color={colors.grey} />
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+
+  const openEditorUsername = () => {
+    setForm({
+      username: userData?.username || '',
+    });
+    setEditingUsername(true);
+  };
+
+  const openEditorBio = () => {
+    setForm({
+      bio: userData?.bio || '',
+    });
+    setEditingBio(true);
+  };
+ const saveProfile = async () => {
+  if (!auth().currentUser) return;
+
+  setSavingProfile(true);
+  try {
+    const userRef = firestore().collection('users').doc(auth().currentUser.uid);
+    const updates = {};
+
+    if (editingUsername) {
+      // Če urejamo username, posodobimo samo to in obvezno preverimo, da ni undefined
+      updates.username = (form.username || '').trim();
+    }
+    if (editingBio) {
+      // Če urejamo bio, posodobimo samo bio
+      updates.bio = (form.bio || '').trim();
+    }
+
+    // Če ni ničesar za posodobiti, izstopimo
+    if (Object.keys(updates).length === 0) {
+      setSavingProfile(false);
+      setEditingUsername(false);
+      setEditingBio(false);
+      return;
+    }
+
+    // Kličemo Firestore update le z ustreznimi polji
+    await userRef.update(updates);
+
+    // Posodobimo lokalni state
+    setUserData(prev => ({
+      ...prev,
+      ...(updates.username !== undefined ? { username: updates.username } : {}),
+      ...(updates.bio      !== undefined ? { bio:      updates.bio }      : {}),
+    }));
+
+    // Zapremo modal
+    setEditingUsername(false);
+    setEditingBio(false);
+
+  } catch (e) {
+    Alert.alert('Error', e.message);
+  } finally {
+    setSavingProfile(false);
+  }
+};
+
 
   /* helper – upload to Imgur and return the https link */
   const uploadAvatarToImgur = async localUri => {
@@ -130,6 +198,7 @@ export default function ProfileScreen({navigation}) {
       </View>
     );
   }
+  
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -160,7 +229,7 @@ export default function ProfileScreen({navigation}) {
       </View>
 
       {/* Profile Info */}
-      <View style={styles.infoContainer}>
+      {/* <View style={styles.infoContainer}>
         <View style={styles.row}>
           <Text style={styles.label}>Name</Text>
           <Text style={styles.value}>{userData?.name || 'N/A'}</Text>
@@ -180,16 +249,36 @@ export default function ProfileScreen({navigation}) {
       </View>
       <TouchableOpacity onPress={openEditor}>
         <Text style={styles.settingsLink}>Edit profile</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+      {/* ---------- profile rows ---------- */}
+      <View style={styles.rowList}>
+        <ProfileRow label="Name" value={userData?.name || 'N/A'} />
+        <ProfileRow
+          label="Username"
+          value={userData?.username || 'N/A'}
+          onPress={openEditorUsername}
+        />
+        <ProfileRow
+          label="Bio"
+          value={userData?.bio || 'No bio yet'}
+          onPress={openEditorBio}
+        />
+        <ProfileRow label="Email" value={userData?.email || 'N/A'} />
+
+       
+      </View>
 
       {/* Settings Link */}
       <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-        <Text style={styles.settingsLink}>Personal information settings</Text>
+        <Text style={styles.settingsLink}>Change password</Text>
       </TouchableOpacity>
-      <Modal visible={editing} transparent animationType="slide">
+      <TouchableOpacity onPress={handleSignOut}>
+        <Text style={styles.signOutTxt}>Sign out</Text>
+      </TouchableOpacity>
+      <Modal visible={editingUsername} transparent animationType="slide">
         <View style={styles.modalWrap}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Edit profile</Text>
+            <Text style={styles.modalTitle}>Edit Username</Text>
 
             <TextInput
               placeholder="Username"
@@ -198,6 +287,29 @@ export default function ProfileScreen({navigation}) {
               value={form.username}
               onChangeText={t => setForm({...form, username: t})}
             />
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: spacing.m,
+              }}>
+              <TouchableOpacity onPress={() => setEditingUsername(false)}>
+                <Text style={styles.cancelTxt}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={saveProfile} disabled={savingProfile}>
+                <Text style={styles.saveTxt}>
+                  {savingProfile ? 'Saving…' : 'Save'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <Modal visible={editingBio} transparent animationType="slide">
+        <View style={styles.modalWrap}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Edit Bio</Text>
 
             <TextInput
               placeholder="Bio"
@@ -214,7 +326,7 @@ export default function ProfileScreen({navigation}) {
                 justifyContent: 'space-between',
                 marginTop: spacing.m,
               }}>
-              <TouchableOpacity onPress={() => setEditing(false)}>
+              <TouchableOpacity onPress={() => setEditingBio(false)}>
                 <Text style={styles.cancelTxt}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={saveProfile} disabled={savingProfile}>
@@ -244,10 +356,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.darkGray1,
     justifyContent: 'center',
     alignItems: 'center',
+    position:'absolute',
+    margin:30,
+    marginTop: 40
   },
   profileContainer: {
     alignItems: 'center',
     marginBottom: spacing.xl,
+    marginTop:spacing.xxl
   },
   avatar: {
     width: 100,
@@ -284,13 +400,13 @@ const styles = StyleSheet.create({
   },
   modalWrap: {
     flex: 1,
-    backgroundColor: '#0008',
+    backgroundColor: '#0009',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalCard: {
     width: '85%',
-    backgroundColor: colors.darkGray1,
+    backgroundColor: colors.darkGray,
     padding: spacing.l,
     borderRadius: 12,
   },
@@ -300,7 +416,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.m,
   },
   modalInput: {
-    backgroundColor: colors.darkGray,
+    backgroundColor: colors.darkGray1,
     color: colors.white,
     borderRadius: 8,
     borderColor: colors.gray31,
@@ -310,4 +426,46 @@ const styles = StyleSheet.create({
   },
   cancelTxt: {color: colors.grey, fontSize: 16},
   saveTxt: {color: colors.moderateRed, fontSize: 16, fontWeight: 'bold'},
+  signOutTxt: {
+    ...typography.paragraph2,
+    color: colors.moderateRed,
+    textAlign: 'left',
+    marginTop: spacing.m,
+  },
+  rowList: {
+    backgroundColor: colors.darkGray,
+    borderRadius: 12,
+    borderColor: colors.gray31,
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginBottom: spacing.xs,
+  },
+
+  rowItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.m,
+    paddingHorizontal: spacing.m,
+    borderBottomColor: colors.gray31,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+
+  rowLabel: {
+    width: '34%',
+    ...typography.paragraph2,
+    color: colors.grey,
+  },
+
+  rowValueWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  rowValue: {
+    ...typography.paragraph2,
+    color: colors.white,
+    maxWidth: '90%',
+  },
 });

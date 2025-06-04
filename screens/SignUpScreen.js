@@ -20,9 +20,11 @@ export default function SignUpScreen({navigation}) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [successVisible, setSuccessVisible] = useState(false);
+  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
 
   const handleSignUp = async () => {
-    if (!email || !password || !confirmPassword) {
+    if (!email || !password || !confirmPassword || !username || !fullName) {
       setError('All fields are required.');
       return;
     }
@@ -48,6 +50,7 @@ export default function SignUpScreen({navigation}) {
         twoFactorEmail:email,
         isTwoFactorEnabled: false,
         createdAt: new Date(),
+        
       });
 
       // Reset fields first
@@ -81,8 +84,10 @@ export default function SignUpScreen({navigation}) {
       </TouchableOpacity>
       <Text style={styles.heading}>Sign up</Text>
 
+      
+
       <TextInput
-        placeholder="email"
+        placeholder="Email"
         placeholderTextColor={colors.grey}
         style={styles.input}
         value={email}
@@ -91,7 +96,7 @@ export default function SignUpScreen({navigation}) {
       />
 
       <TextInput
-        placeholder="password"
+        placeholder="Password"
         placeholderTextColor={colors.grey}
         style={styles.input}
         value={password}
@@ -100,12 +105,30 @@ export default function SignUpScreen({navigation}) {
       />
 
       <TextInput
-        placeholder="confirm Password"
+        placeholder="Confirm Password"
         placeholderTextColor={colors.grey}
         style={styles.input}
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
+      />
+
+      <TextInput
+        placeholder="Username"
+        placeholderTextColor={colors.grey}
+        style={styles.input}
+        value={username}
+        onChangeText={setUsername}
+        autoCapitalize="none"
+      />
+
+      <TextInput
+        placeholder="Full Name"
+        placeholderTextColor={colors.grey}
+        style={styles.input}
+        value={fullName}
+        onChangeText={setFullName}
+        autoCapitalize="words"
       />
 
       {error && <Text style={styles.error}>{error}</Text>}
@@ -180,5 +203,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.darkGray1,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    top: 40,
+    left: spacing.s
+
   },
 });
