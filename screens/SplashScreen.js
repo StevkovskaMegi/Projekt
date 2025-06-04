@@ -1,14 +1,13 @@
 // screens/SplashScreen.js
 import React, { useEffect } from 'react';
 import { View, Image, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { useNavigation }    from '@react-navigation/native';   // ⬅️
 
-export default function SplashScreen({ navigation }) {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('Welcome');
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [navigation]);
+export default function SplashScreen({ }) {
+    // če prop ni podan (npr. v App.js), vzamemo useNavigation
+// SplashScreen.js
+
+
 
   return (
     <View style={styles.container}>
