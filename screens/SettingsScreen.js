@@ -8,7 +8,7 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
-import {colors, typography, spacing} from '../theme/theme';
+import {colors, typography, spacing, button} from '../theme/theme';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Alert} from 'react-native';
 import auth from '@react-native-firebase/auth';
@@ -140,7 +140,7 @@ export default function SettingsScreen({navigation}) {
             {/* save button */}
             <TouchableOpacity
               style={[
-                styles.option,
+                styles.option1,
                 {justifyContent: 'center', marginTop: spacing.s},
                 changingPwd && {opacity: 0.6},
               ]}
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   inputFocused: {
-    borderColor: colors.gray31, // or any color you want on focus
+    borderColor: colors.white, // or any color you want on focus
     borderWidth: 1,
   },
 
@@ -208,12 +208,21 @@ const styles = StyleSheet.create({
   },
   input: {
     ...typography.paragraph2,
-    borderColor: colors.white,
+    borderColor: colors.gray31,
     backgroundColor: colors.darkGray1,
     borderWidth: 1,
     borderRadius: 12,
     padding: 16,
     marginBottom: spacing.m,
     color: colors.white,
+  },
+  option1: {
+    ...button.primary,
+    alignSelf: 'center',
+    width: '100%',
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    
   },
 });
