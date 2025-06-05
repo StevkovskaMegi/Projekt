@@ -8,27 +8,57 @@ import {
   StyleSheet,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {TouchableWithoutFeedback} from 'react-native';
 
 import {colors, typography, button, spacing} from '../theme/theme';
 import {Dimensions} from 'react-native';
 
 const {width, height} = Dimensions.get('window');
 export default function LoginScreen({navigation}) {
+  const [forgotModalVisible, setForgotModalVisible] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [resetError, setResetError] = useState(null);
 
   const handleLogin = async () => {
     try {
-      await auth().signInWithEmailAndPassword(email, password);
-      navigation.navigate('Home');
+      await auth().signInWithEmailAndPassword(email.trim(), password);
     } catch (err) {
       setError('Invalid email or password.');
+    }
+  };
+  console.log('Modal visible?', forgotModalVisible);
+
+  const handlePasswordReset = async () => {
+    if (!resetEmail) {
+      setResetError('Please enter your email.');
+      return;
+    }
+
+    try {
+      await auth().sendPasswordResetEmail(resetEmail);
+      setForgotModalVisible(false);
+      setResetEmail('');
+      setError(null);
+
+      setTimeout(() => {
+        navigation.navigate('Login', {from: 'reset'});
+      }, 300);
+    } catch (err) {
+      setResetError('Failed to send password reset email.');
     }
   };
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={24} color={colors.white} />
+      </TouchableOpacity>
       <View style={styles.topContainer}>
         <Text style={styles.heading}>Log in</Text>
 
@@ -47,10 +77,21 @@ export default function LoginScreen({navigation}) {
           style={styles.input}
           value={password}
           onChangeText={setPassword}
-          secureTextEntry
+          secureTextEntry={true}
+          autoCorrect={false}
+          autoCapitalize="none"
+          autoComplete="off"
+          textContentType="password"
         />
 
-        <Text style={styles.redirect}>Forgot password?</Text>
+        <TouchableOpacity
+          onPress={() => {
+            setResetEmail(email);
+            setForgotModalVisible(true);
+            console.log('Forgot password pressed');
+          }}>
+          <Text style={styles.redirect}>Forgot password?</Text>
+        </TouchableOpacity>
 
         {error && <Text style={styles.error}>{error}</Text>}
 
@@ -68,6 +109,33 @@ export default function LoginScreen({navigation}) {
           <Text style={button.secondary}>Sign Up</Text>
         </TouchableOpacity>
       </View>
+      {forgotModalVisible && (
+        <TouchableWithoutFeedback onPress={() => setForgotModalVisible(false)}>
+          <View style={styles.absoluteModal}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalHeading}>Reset Password</Text>
+
+                <TextInput
+                  placeholder="Enter your email"
+                  placeholderTextColor={colors.grey}
+                  style={styles.input}
+                  value={resetEmail}
+                  onChangeText={setResetEmail}
+                  autoCapitalize="none"
+                />
+                {resetError && <Text style={styles.error}>{resetError}</Text>}
+
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handlePasswordReset}>
+                  <Text style={styles.buttonStyleEmail}>Send Email</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      )}
     </View>
   );
 }
@@ -97,6 +165,8 @@ const styles = StyleSheet.create({
     width: '100%',
     color: colors.white,
     marginBottom: spacing.s,
+    borderColor: colors.gray31,
+    borderWidth: 1,
   },
   error: {
     color: 'red',
@@ -110,7 +180,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   link: {
-    color: colors.white,
+    color: colors.grey,
     textAlign: 'center',
     marginBottom: spacing.s,
   },
@@ -120,10 +190,56 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     alignItems: 'center',
-    marginBottom: height * 0.05
+    marginBottom: height * 0.05,
   },
   topContainer: {
-    alignItems: 'left',
-    marginTop: height * 0.3
+    alignItems: 'absolute',
+    marginTop: height * 0.3,
+  },
+  absoluteModal: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+  modalContent: {
+    backgroundColor: colors.darkGray,
+    borderRadius: 10,
+    padding: 20,
+    width: '85%',
+    maxHeight: '30%',
+  },
+  modalHeading: {
+    color: colors.white,
+    fontSize: 20,
+    marginBottom: spacing.m,
+    textAlign: 'left',
+  },
+  cancelText: {
+    color: colors.moderateRed,
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  backButton: {
+    marginBottom: spacing.xxl,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.darkGray1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    left: spacing.m,
+    zIndex: 10,
+    top: 40,
+  },
+  buttonStyleEmail: {
+    ...button.primary,
+    textAlign: 'center',
   },
 });
