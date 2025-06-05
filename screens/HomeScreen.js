@@ -254,6 +254,12 @@ export default function HomeScreen({navigation}) {
         onPress={() => navigation.navigate('OutfitGenerator')}>
         <Text style={styles.buttonText}>Create Your Own Look</Text>
       </TouchableOpacity>
+      <View style={styles.downloadWrapper}>
+        <Image
+          source={require('../assets/images/home.png')}
+          style={styles.downloadImage}
+        />
+      </View>
     </ScrollView>
   );
 }
@@ -377,5 +383,13 @@ const styles = StyleSheet.create({
     color: colors.white,
     marginBottom: spacing.l,
     lineHeight: 20,
+  }, downloadWrapper: {
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+  },
+  downloadImage: {
+    width: 120,          // Adjust these dimensions as needed
+    height: 120,
+    resizeMode: 'contain',
   },
 });
