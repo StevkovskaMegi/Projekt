@@ -23,9 +23,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
-const OPENAI_KEY =
-  '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';
-const WEATHER_KEY = '98ea1a0c58361186dc9e9d2e58a474c3';
+
 
 export default function OutfitGeneratorScreen({route}) {
   const [outfits, setOutfits] = useState([]);
@@ -132,18 +130,17 @@ export default function OutfitGeneratorScreen({route}) {
       .join('\n');
     const prompt = `You are a fashion assistant.
 Category rules:
-- Tops = categories Shirts, Tops, Blouses, T-Shirts, Sweaters
-- Bottoms = categories Pants, Jeans, Skirts
-- Dresses = category Dresses (can be used alone as a full outfit)
-- Jackets = category Jackets (can be paired optionally with Tops)
-- Shoes = categories Shoes, Boots, Sneakers, Heels
-- Accessories = category Accessories (e.g. bags, scarves — optional)
+•  Tops = categories Shirts, Tops, Blouses, T-Shirts, Sweaters
+•  Bottoms = categories Pants, Jeans, Skirts
+•  Dresses = category Dresses (can be used alone as a full outfit)
+•  Jackets = category Jackets (can be paired optionally with Tops)
+•  Shoes = categories Shoes, Boots, Sneakers, Heels
+•  Accessories = category Accessories (e.g. bags, scarves — optional)
 
 Given these items:
 ${list}
 
 Weather: ${weatherTag}
-Occasion: casual
 Hint: Make a different stylish choice each time, no repeats!
 Pick one of the following outfit types:
 A) A Dress with Shoes (+ optional Jacket or Accessories)  

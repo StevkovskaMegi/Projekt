@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: 'contain',
     marginBottom: 10,
-  },//test
+  },
   title: {
     fontSize: 28,
     color: '#C13551',
