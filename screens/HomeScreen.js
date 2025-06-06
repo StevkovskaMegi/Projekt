@@ -17,6 +17,7 @@ import {colors, typography, button, spacing} from '../theme/theme';
 import {fetchWeatherInfo} from '../utils/weather';
 import Icon from 'react-native-vector-icons/Feather';
 import Geolocation from 'react-native-geolocation-service';
+import Fontisto from 'react-native-vector-icons/Fontisto';
 import {PermissionsAndroid, Platform} from 'react-native';
 const {width, height} = Dimensions.get('window');
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -54,10 +55,10 @@ export default function HomeScreen({navigation}) {
           .get();
         if (doc.exists) {
           const data = doc.data();
-          setUserName(data.username || data.fullName || currentUser.email);
+          setUserName(data.fullName || data.username || currentUser.email);
         } else {
           // Če dokument ne obstaja, privzeti naslov
-          setUserName("trendsetter");
+          setUserName('trendsetter');
         }
       } catch (e) {
         console.error('Napaka pri branju uporabniškega profila:', e);
@@ -235,31 +236,41 @@ export default function HomeScreen({navigation}) {
           <Text style={styles.weatherPopupText}>{weather.tag}</Text>
         </View>
       )}
+      <View style={styles.weatherText}>
+        {/* <Text style={styles.date}>{tip}</Text> */}
+        <Text style={styles.description}>
+          What should I wear to look my best?
+        </Text>
+        <Text style={styles.description1}>
+          No more doubts about combinations:Browse your closet, get inspired,
+          and create looks that make every day a fashion statement.
+        </Text>
+        <TouchableOpacity
+          style={styles.actionButton1}
+          onPress={() => navigation.navigate('OutfitGenerator')}>
+            
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
 
-      {/* <Text style={styles.date}>{tip}</Text> */}
-      <Text style={styles.description}>Today's outfit suggestions</Text>
-      <Text style={styles.description1}>
-        Finding the perfect piece for your wardrobe just got easier! Our goal is
-        to help you discover outfit ideas tailored to your style and the
-        weather. Browse your closet, get inspired, and create looks that make
-        every day a fashion statement.
-      </Text>
+            <Text style={styles.buttonText1}>Create Your Own Look </Text>
+          <Fontisto
+              name="arrow-right-l"
+              size={20}
+              color={colors.darkGray1}
+              style={{marginRight: spacing.s}}
+            />
+            </View>
+        </TouchableOpacity>
+        <View style={styles.downloadWrapper}>
+          <Image
+            source={require('../assets/images/home2.png')}
+            style={styles.downloadImage}
+          />
+        </View>
+      </View>
 
       {selectedCategories.map(([category, items]) =>
         renderCategorySection(category, items),
       )}
-
-      <TouchableOpacity
-        style={styles.actionButton}
-        onPress={() => navigation.navigate('OutfitGenerator')}>
-        <Text style={styles.buttonText}>Create Your Own Look</Text>
-      </TouchableOpacity>
-      <View style={styles.downloadWrapper}>
-        <Image
-          source={require('../assets/images/home.png')}
-          style={styles.downloadImage}
-        />
-      </View>
     </ScrollView>
   );
 }
@@ -268,7 +279,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.darkGray,
-    paddingHorizontal: spacing.m,
     paddingTop: '10%',
   },
   loaderContainer: {
@@ -282,17 +292,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginHorizontal: spacing.m,
   },
   greeting: {
     ...typography.heading1,
     fontStyle: 'italic',
-    color: colors.moderateRed,
+    color: colors.white,
     marginBottom: spacing.s,
+    marginTop: spacing.m,
   },
   weatherText: {
     color: colors.white,
     fontStyle: 'italic',
     marginBottom: spacing.s,
+    // backgroundColor: '#EDBFC8',
+    backgroundColor: '#C7B7A9',
+    padding: spacing.s,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    marginTop: spacing.m,
   },
   date: {
     ...typography.body,
@@ -320,12 +338,13 @@ const styles = StyleSheet.create({
   },
 
   categorySection: {
-    marginBottom: spacing.l,
+    marginBottom: spacing.s,
+    marginHorizontal: spacing.m,
+    marginBottom: '10%',
   },
   categoryTitle: {
-    ...typography.heading2,
+    ...typography.heading3,
     color: colors.white,
-    marginBottom: spacing.s,
   },
   carouselContainer: {
     paddingVertical: spacing.s,
@@ -367,6 +386,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     padding: 15,
     width: width * 0.3,
+    
   },
   weatherPopupText: {
     color: colors.white,
@@ -375,21 +395,32 @@ const styles = StyleSheet.create({
   },
   description: {
     ...typography.heading3,
-    color: colors.white,
+    color: colors.darkGray,
     marginBottom: spacing.s,
   },
   description1: {
     ...typography.paragraph2,
-    color: colors.white,
-    marginBottom: spacing.l,
+    color: colors.darkGray,
     lineHeight: 20,
-  }, downloadWrapper: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
   },
-  downloadImage: {
-    width: 120,          // Adjust these dimensions as needed
-    height: 120,
-    resizeMode: 'contain',
+  actionButton1: {
+    paddingTop: spacing.s,
+    borderRadius: 16,
+    alignItems: 'flex-start',
+  },
+  buttonText1: {
+    fontWeight: 'bold',
+    color: colors.darkGray1,
+  },
+  downloadWrapper: {
+    alignItems: 'center',
+  },
+   downloadImage: {
+    width: width * 0.9,     // 60% of screen width
+    height: (width * 0.9) * 1,  // keep a 5:3 ratio (adjust as you like)
+    resizeMode: 'cover',
+    borderRadius: 10,
+    marginTop: spacing.s,
+    zIndex: 1,
   },
 });

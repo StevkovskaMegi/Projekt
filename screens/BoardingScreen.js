@@ -6,7 +6,10 @@ import {Dimensions} from 'react-native';
 
 const {width, height} = Dimensions.get('window');
 
+
 export default function BoardingScreen({navigation}) {
+  console.log('Razpoložljivi screeni v AuthStack:',
+  navigation.getState()?.routes?.map(r => r.name));
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
@@ -15,8 +18,7 @@ export default function BoardingScreen({navigation}) {
           style={[styles.image, {height: '50%'}]} 
         />
 
-        <Text style={styles.title}>Welcome to your </Text>
-        <Text style={styles.title}>curated closet</Text>
+        <Text style={styles.title}>What2Wear</Text>
         <Text style={styles.subtitle}>Your daily outfit assistant</Text>
       </View>
       <View style={{flex: 1}} />
