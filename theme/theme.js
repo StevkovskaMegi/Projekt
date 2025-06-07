@@ -16,43 +16,43 @@ export const colors = {
   blue: '#8C91F3',
   darkGray1: '#2A2A2A',
 };
-
 export const typography = {
   heading1: {
     fontSize: 29,
     fontWeight: 'bold',
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'Lato-Bold',
   },
   heading2: {
     fontSize: 24,
     fontWeight: 'medium',
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'Lato-Bold',
   },
   heading3: {
     fontSize: 20,
     fontWeight: 'semibold',
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'Lato-BoldItalic',
+    fontVariationSettings: 'wght 600',
   },
   heading4: {
     fontSize: 17,
     fontWeight: 'regular',
-    fontFamily: 'PlayfairDisplay',
+    fontFamily: 'Lato-Regular',
   },
   paragraph1: {
     fontSize: 17,
     fontWeight: 'regular',
-    fontFamily: 'Inter',
+    fontFamily: 'Lato-Regular',
   },
   paragraph2: {
     fontSize: 15,
     fontWeight: 'regular',
-    fontFamily: 'Inter',
+    fontFamily: 'Lato-Regular',
   },
 
   paragraph3: {
     fontSize: 13,
     fontWeight: 'regular',
-    fontFamily: 'Inter',
+    fontFamily: 'Lato-Regular',
   },
 };
 
