@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   buttonText1: {
-    fontWeight: 'bold',
+    ...typography.paragraph2,
     color: colors.darkGray1,
   },
   downloadWrapper: {
